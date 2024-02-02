@@ -1,3 +1,15 @@
+body {
+    width: min-content;
+    text-align: center;
+    margin: auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
 .grid-container {
     display: grid;
       grid-template-columns: repeat(10, 50px);
