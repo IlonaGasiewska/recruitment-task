@@ -16,9 +16,7 @@ const createGrid = () => {
 const colorizeGrid = (columnColors) => {
     const gridItems = document.querySelectorAll('.grid-item');
     gridItems.forEach((item, index) => {
-        const column = Math.floor(index / numRows);
-        const color = columnColors[column] || 'white';
-
+        const color = columnColors[index] || 'white';
         item.style.backgroundColor = color;
     });
 };
@@ -38,19 +36,13 @@ const setupAudioContext = () => {
     const updateVisualization = () => {
         analyser.getByteFrequencyData(dataArray);
 
-        const columnColors = [];
+        const maxAmplitude = Math.max(...dataArray);
+        const scale = maxAmplitude > 0 ? 1 / maxAmplitude : 0;
 
-        for (let i = 0; i < numColumns; i++) {
-            const start = Math.floor((i / numColumns) * bufferLength);
-            const end = Math.floor(((i + 1) / numColumns) * bufferLength);
-            const sum = dataArray.slice(start, end).reduce((acc, val) => acc + val, 0);
-            const average = sum / (end - start + 1);
-
-            const normalizedValue = average / 256;
-            const color = `rgba(255, 0, 0, ${normalizedValue})`;
-
-            columnColors.push(color);
-        }
+        const columnColors = Array.from(dataArray).map(value => {
+            const scaledValue = value * scale;
+            return scaledValue > 0.1 ? 'red' : 'white';
+        });
 
         colorizeGrid(columnColors.reverse());
         requestAnimationFrame(updateVisualization);
@@ -71,7 +63,7 @@ audioInput.addEventListener('change', function () {
         });
 
         audioPlayer.addEventListener('pause', function () {
-            colorizeGrid([]);
+            colorizeGrid(Array(numColumns).fill('white'));
         });
     }
 });
